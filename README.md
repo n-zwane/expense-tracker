@@ -13,11 +13,11 @@ A minimalist expense tracker with dark mode, monthly charts, and local storage s
 
 ## How to Use 🚀
 
-1. **Live Demo**: [View on GitHub Pages](https://yourusername.github.io/spendr/)
+1. **Live Demo**: https://n-zwane.github.io/expense-tracker/
 2. **Local Setup**:
     - Clone the repo:
         ```bash
-        git clone https://github.com/yourusername/spendr.git
+        git clone clone https://github.com/n-zwane/expense-tracker.git
         ```
     - Open `index.html` in a browser.
 
