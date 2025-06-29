@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Spendr - Expense Tracker</title>
+        <link rel="stylesheet" href="style.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        />
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Header with Theme Toggle -->
+            <header>
+                <h1>Spendr</h1>
+                <div class="theme-toggle">
+                    <input type="checkbox" id="toggle_checkbox" />
+                    <label for="toggle_checkbox">
+                        <div id="star">
+                            <div class="star" id="star-1">★</div>
+                            <div class="star" id="star-2">★</div>
+                        </div>
+                        <div id="moon"></div>
+                    </label>
+                </div>
+            </header>
+
+            <!-- Balance Summary -->
+            <section class="balance-summary">
+                <div class="balance-card">
+                    <h3>Your Balance</h3>
+                    <p id="balance-amount">R0.00</p>
+                </div>
+                <div class="income-expense">
+                    <div class="income">
+                        <h4>Income</h4>
+                        <p id="income-amount">R0.00</p>
+                    </div>
+                    <div class="expense">
+                        <h4>Expense</h4>
+                        <p id="expense-amount">R0.00</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Transaction Form -->
+            <section class="add-transaction">
+                <h3>Add Transaction</h3>
+                <form id="transaction-form">
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input
+                            type="text"
+                            id="description"
+                            placeholder="e.g., Groceries"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input
+                            type="number"
+                            id="amount"
+                            placeholder="e.g., 150.00"
+                            step="0.01"
+                            required
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="">Select a category</option>
+                            <option value="food">Food</option>
+                            <option value="bills">Bills</option>
+                            <option value="transport">Transport</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="salary">Salary</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group radio-group">
+                        <div class="radio-option">
+                            <input
+                                type="radio"
+                                id="income"
+                                name="type"
+                                value="income"
+                                checked
+                            />
+                            <label for="income">Income</label>
+                        </div>
+                        <div class="radio-option">
+                            <input
+                                type="radio"
+                                id="expense"
+                                name="type"
+                                value="expense"
+                            />
+                            <label for="expense">Expense</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Add Transaction</button>
+                </form>
+            </section>
+
+            <!-- Monthly Visualization -->
+            <section class="monthly-visualization">
+                <div class="section-header">
+                    <h3>Monthly Summary</h3>
+                </div>
+                <canvas id="monthlyChart"></canvas>
+            </section>
+
+            <!-- Transaction History -->
+            <section class="transaction-history">
+                <div class="section-header">
+                    <h3>Transaction History</h3>
+                    <div class="search-filter">
+                        <input
+                            type="text"
+                            id="search"
+                            placeholder="Search transactions..."
+                        />
+                        <select id="filter-category">
+                            <option value="">All Categories</option>
+                            <option value="food">Food</option>
+                            <option value="bills">Bills</option>
+                            <option value="transport">Transport</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="salary">Salary</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <ul id="transactions-list"></ul>
+            </section>
+
+            <!-- Footer -->
+            <footer>
+                <p>Created with ❤️ by Nicoroy Zwane</p>
+                <p>
+                    Theme toggle adapted from
+                    <a
+                        href="https://foolishdeveloper.com/how-to-create-a-custom-toggle-switch-using-html-css/"
+                        target="_blank"
+                        >FoolishDeveloper.com</a
+                    >
+                </p>
+                <p>
+                    <a
+                        href="https://github.com/yourusername/spendr"
+                        target="_blank"
+                        >View on GitHub</a
+                    >
+                </p>
+            </footer>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+</html>
