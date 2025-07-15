@@ -389,6 +389,21 @@ h1 {
     color: #777;
 }
 
+/* Category Breakdown */
+.category-breakdown {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+}
+
+#categoryChart {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 400px;
+}
+
 /* Footer */
 footer {
     margin-top: 40px;

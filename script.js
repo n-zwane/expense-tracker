@@ -1,3 +1,5 @@
+let categoryChart;
+
 document.addEventListener("DOMContentLoaded", function () {
     // DOM Elements
     const transactionForm = document.getElementById("transaction-form");
@@ -56,6 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
         addTransactionToDOM(transaction);
         updateBalance();
         updateMonthlyChart();
+        updateCategoryChart(); // Added this line to update pie chart on form submission
         transactionForm.reset();
     });
 
@@ -86,6 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
         transactions.forEach((transaction) => addTransactionToDOM(transaction));
         updateBalance();
         updateMonthlyChart();
+        updateCategoryChart();
     }
 
     // Add transaction to DOM
@@ -150,6 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Recalculate balances
         updateBalance();
         updateMonthlyChart();
+        updateCategoryChart();
     }
 
     // Update balance
@@ -196,6 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         updateMonthlyChart();
+        updateCategoryChart();
     }
 
     // Update monthly chart
@@ -293,6 +299,107 @@ document.addEventListener("DOMContentLoaded", function () {
                                     );
                                 },
                             },
+                        },
+                    },
+                },
+            });
+        }
+    }
+
+    // Update category chart
+    function updateCategoryChart() {
+        // Get current theme colors
+        const isDark = document.body.getAttribute("data-theme") === "dark";
+        const textColor = isDark ? "rgb(119, 119, 119)" : "rgb(119, 119, 119)";
+        const borderColor = isDark
+            ? "rgb(119, 119, 119)"
+            : "rgb(119, 119, 119)";
+
+        // Filter only expense transactions
+        const expenses = transactions.filter((t) => t.type === "expense");
+
+        // Group by category
+        const categoryData = {};
+        expenses.forEach((transaction) => {
+            if (!categoryData[transaction.category]) {
+                categoryData[transaction.category] = 0;
+            }
+            categoryData[transaction.category] += transaction.amount;
+        });
+
+        // Prepare data for chart
+        const labels = Object.keys(categoryData).map(
+            (category) =>
+                category.charAt(0).toUpperCase() +
+                category.slice(1).toLowerCase()
+        );
+        const data = Object.values(categoryData);
+
+        // Category colors
+        const backgroundColors = [
+            "rgba(244, 67, 54, 0.8)", // Red
+            "rgba(255, 152, 0, 0.8)", // Orange
+            "rgba(255, 235, 59, 0.8)", // Yellow
+            "rgba(76, 175, 80, 0.8)", // Green
+            "rgba(33, 150, 243, 0.8)", // Blue
+            "rgba(156, 39, 176, 0.8)", // Purple
+            "rgba(233, 30, 99, 0.8)", // Pink
+        ];
+
+        // Create or update chart
+        const ctx = document.getElementById("categoryChart").getContext("2d");
+
+        if (categoryChart) {
+            // Update existing chart
+            categoryChart.data.labels = labels;
+            categoryChart.data.datasets[0].data = data;
+            categoryChart.data.datasets[0].backgroundColor =
+                backgroundColors.slice(0, labels.length);
+            categoryChart.update();
+        } else {
+            // Create new chart
+            categoryChart = new Chart(ctx, {
+                type: "pie",
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            data: data,
+                            backgroundColor: backgroundColors.slice(
+                                0,
+                                labels.length
+                            ),
+                            borderColor: borderColor,
+                            borderWidth: 1,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: "right",
+                            labels: {
+                                color: textColor,
+                                font: {
+                                    size: 12,
+                                    family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                                },
+                            },
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return `${
+                                        context.label
+                                    }: R${context.raw.toFixed(2)}`;
+                                },
+                            },
+                            bodyColor: textColor,
+                            titleColor: textColor,
+                            backgroundColor: isDark ? "#1e1e1e" : "#ffffff",
+                            borderColor: borderColor,
+                            borderWidth: 1,
                         },
                     },
                 },
