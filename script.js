@@ -90,6 +90,13 @@ document.addEventListener("DOMContentLoaded", function () {
         updateBalance();
         updateMonthlyChart();
         updateCategoryChart();
+
+        document
+            .getElementById("export-csv")
+            .addEventListener("click", exportToCSV);
+        document
+            .getElementById("export-pdf")
+            .addEventListener("click", exportToPDF);
     }
 
     // Add transaction to DOM
@@ -344,6 +351,8 @@ document.addEventListener("DOMContentLoaded", function () {
             "rgba(33, 150, 243, 0.8)", // Blue
             "rgba(156, 39, 176, 0.8)", // Purple
             "rgba(233, 30, 99, 0.8)", // Pink
+            "rgba(63, 81, 181, 0.7)", // Indigo
+            "rgba(0, 150, 136, 0.7)", // Teal
         ];
 
         // Create or update chart
@@ -421,5 +430,124 @@ document.addEventListener("DOMContentLoaded", function () {
     function formatDate(dateString) {
         const options = { year: "numeric", month: "short", day: "numeric" };
         return new Date(dateString).toLocaleDateString("en-US", options);
+    }
+
+    // Add these functions to script.js
+
+    // CSV Export
+    document
+        .getElementById("export-csv")
+        .addEventListener("click", exportToCSV);
+
+    function exportToCSV() {
+        if (transactions.length === 0) {
+            alert("No transactions to export");
+            return;
+        }
+
+        // Create CSV header
+        let csv = "ID,Description,Amount,Date,Category,Type\n";
+
+        // Add each transaction
+        transactions.forEach((transaction) => {
+            csv += `${transaction.id},"${transaction.description}",${transaction.amount},"${transaction.date}","${transaction.category}","${transaction.type}"\n`;
+        });
+
+        // Create download link
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `spendr_transactions_${new Date()
+            .toISOString()
+            .slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // PDF Export
+    document
+        .getElementById("export-pdf")
+        .addEventListener("click", exportToPDF);
+
+    function exportToPDF() {
+        if (transactions.length === 0) {
+            alert("No transactions to export");
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Add title
+        doc.setFontSize(18);
+        doc.text("Spendr Transaction History", 14, 20);
+
+        // Add date
+        doc.setFontSize(10);
+        doc.text(`Exported on: ${new Date().toLocaleDateString()}`, 14, 28);
+
+        // Add balance summary
+        doc.setFontSize(12);
+        doc.text(
+            `Current Balance: R${balanceAmount.textContent.substring(1)}`,
+            14,
+            36
+        );
+        doc.text(
+            `Total Income: R${incomeAmount.textContent.substring(1)}`,
+            14,
+            44
+        );
+        doc.text(
+            `Total Expenses: R${expenseAmount.textContent.substring(1)}`,
+            14,
+            52
+        );
+
+        // Prepare table data
+        const tableData = transactions.map((transaction) => [
+            transaction.id,
+            transaction.description,
+            transaction.type === "income"
+                ? `R${transaction.amount.toFixed(2)}`
+                : `-R${transaction.amount.toFixed(2)}`,
+            formatDate(transaction.date),
+            transaction.category.charAt(0).toUpperCase() +
+                transaction.category.slice(1),
+            transaction.type.charAt(0).toUpperCase() +
+                transaction.type.slice(1),
+        ]);
+
+        // Add table
+        doc.autoTable({
+            startY: 60,
+            head: [["ID", "Description", "Amount", "Date", "Category", "Type"]],
+            body: tableData,
+            theme: "grid",
+            headStyles: {
+                fillColor: [33, 150, 243],
+                textColor: 255,
+            },
+            styles: {
+                cellPadding: 3,
+                fontSize: 9,
+                valign: "middle",
+            },
+            columnStyles: {
+                0: { cellWidth: 15 },
+                1: { cellWidth: 50 },
+                2: { cellWidth: 25 },
+                3: { cellWidth: 30 },
+                4: { cellWidth: 30 },
+                5: { cellWidth: 25 },
+            },
+        });
+
+        // Save the PDF
+        doc.save(
+            `spendr_transactions_${new Date().toISOString().slice(0, 10)}.pdf`
+        );
     }
 });

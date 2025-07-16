@@ -9,6 +9,9 @@
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
+        <!-- For export function -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
     <body>
@@ -77,11 +80,14 @@
                         <label for="category">Category</label>
                         <select id="category" required>
                             <option value="">Select a category</option>
-                            <option value="food">Food</option>
-                            <option value="bills">Bills</option>
                             <option value="transport">Transport</option>
                             <option value="shopping">Shopping</option>
-                            <option value="salary">Salary</option>
+                            <option value="salary">Subscriptions</option>
+                            <option value="bills">Living Essentials</option>
+                            <option value="food">Food and Dining</option>
+                            <option value="salary">Health and Wellness</option>
+                            <option value="salary">Salary or Income</option>
+                            <option value="salary">Savings</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
@@ -148,6 +154,19 @@
                     </div>
                 </div>
                 <ul id="transactions-list"></ul>
+            </section>
+
+            <!-- Export Options -->
+            <section class="export-options">
+                <h3>Export Data</h3>
+                <div class="export-buttons">
+                    <button id="export-csv" class="btn export-btn">
+                        Export to CSV
+                    </button>
+                    <button id="export-pdf" class="btn export-btn">
+                        Export to PDF
+                    </button>
+                </div>
             </section>
 
             <!-- Footer -->
