@@ -9,6 +9,16 @@
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
         />
+        <!-- Linking the Manifest-->
+        <!-- PWA Meta Tags -->
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#2196f3" />
+        <!-- iOS Support -->
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
         <!-- For export function -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -191,5 +201,33 @@
         </div>
 
         <script src="script.js"></script>
+
+        <div
+            id="offline-alert"
+            style="
+                display: none;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #f44336;
+                color: white;
+                padding: 10px;
+                text-align: center;
+            "
+        >
+            You are offline. Changes will sync when you reconnect.
+        </div>
+
+        <script>
+            // Show offline alert
+            window.addEventListener("offline", () => {
+                document.getElementById("offline-alert").style.display =
+                    "block";
+            });
+            window.addEventListener("online", () => {
+                document.getElementById("offline-alert").style.display = "none";
+            });
+        </script>
     </body>
 </html>

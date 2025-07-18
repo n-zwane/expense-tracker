@@ -1,3 +1,23 @@
+// Register Service Worker
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) => console.log("Service Worker Registered"))
+            .catch((err) => console.log("Service Worker Error:", err));
+    });
+}
+
+// Check Online/Offline Status
+window.addEventListener("online", () => {
+    console.log("Back online!");
+    // Optional: Sync data if needed
+});
+
+window.addEventListener("offline", () => {
+    console.log("Offline mode - using cached data");
+});
+
 let categoryChart;
 
 document.addEventListener("DOMContentLoaded", function () {

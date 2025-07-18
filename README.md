@@ -14,13 +14,16 @@ I created **Spendr** after searching for a simple, ad-free expense tracker and r
 
 ## ✨ Features
 
-- Add income and expense transactions  
-- View balance, income, and expense summaries  
-- Interactive monthly bar chart (Chart.js)  
-- Dark/light theme toggle  
-- Search and filter transactions  
-- Mobile-friendly design  
-- 100% offline (uses local storage – no sign-in needed, no ads, no tracking)
+-   Add income and expense transactions
+-   View balance, income, and expense summaries
+-   Interactive monthly bar chart (Chart.js)
+-   Dark/light theme toggle
+-   Search and filter transactions
+-   Mobile-friendly design
+-   100% offline (uses local storage – no sign-in needed, no ads, no tracking)
+-   Export data to CSV/PDF
+-   Offline-first (works without internet)
+-   Installable as a PWA (feels like a native app)
 
 ---
 
@@ -37,9 +40,29 @@ I created **Spendr** after searching for a simple, ad-free expense tracker and r
 
 ## 🛠️ Tech Stack
 
-- HTML5, CSS3, JavaScript (ES6)
-- Chart.js for visualizations
-- Font Awesome for icons
+-   Frontend: Vanilla JavaScript (ES6), HTML5, CSS3
+-   Visualizations: Chart.js
+-   Icons: Font Awesome
+-   Offline Magic: Service Workers, Cache API
+
+---
+
+### 🧗 Development Journey: Challenges & Solutions
+
+1. **Making It Work Offline**
+
+-   Problem: Live Server blocked true offline testing.
+-   Fix: Used Chrome’s Go offline mode + deployed to GitHub Pages for real-world testing.
+
+2. **Cache Storage Mysteries**
+
+-   Problem: Cached files weren’t appearing in DevTools.
+-   Fix: Debugged sw.js paths and manually activated the Service Worker.
+
+3. **PWA Installation**
+
+-   Problem: Favicon 404 errors cluttered the console.
+-   Fix: Added a favicon and optimized cache rules.
 
 ---
 
@@ -49,4 +72,3 @@ This project is open-source under the MIT License.
 Feel free to use it, learn from it, and make it your own — no ads, no paywalls, no nonsense.
 
 ---
-
