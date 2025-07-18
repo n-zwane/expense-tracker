@@ -1,9 +1,9 @@
 // Register Service Worker
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-        .register("/sw.js", { scope: "/" })
+        .register("/expense-tracker/sw.js", { scope: "/expense-tracker/" })
         .then((reg) => console.log("SW registered for scope:", reg.scope))
-        .catch((err) => console.error("SW registration failed:", err));
+        .catch((err) => console.error("SW failed:", err));
 }
 
 // Check Online/Offline Status
