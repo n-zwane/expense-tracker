@@ -248,12 +248,14 @@ h1 {
     display: flex;
     gap: 15px;
     margin-top: 15px;
+    align-items: center;
 }
 
 .radio-option {
     display: flex;
     align-items: center;
     gap: 5px;
+    white-space: nowrap;
 }
 
 .btn {
@@ -472,5 +474,34 @@ footer a:hover {
     .search-filter {
         width: 100%;
         flex-direction: column;
+    }
+}
+
+/* Added iOS fixes for radio buttons */
+@supports (-webkit-touch-callout: none) {
+    .radio-option input[type="radio"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border-color);
+        border-radius: 50%;
+        margin: 0;
+        position: relative;
+    }
+
+    .radio-option input[type="radio"]:checked {
+        border-color: var(--button-color);
+    }
+
+    .radio-option input[type="radio"]:checked::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 10px;
+        height: 10px;
+        background: var(--button-color);
+        border-radius: 50%;
     }
 }
