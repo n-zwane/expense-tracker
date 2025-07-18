@@ -1,11 +1,11 @@
 const CACHE_NAME = "spendr-v1";
 const ASSETS = [
-    "/",
-    "/index.html",
-    "/style.css",
-    "/script.js",
-    "/icons/icon-192x192.png",
-    "/icons/icon-512x512.png",
+    "/expense-tracker/",
+    "/expense-tracker/index.html",
+    "/expense-tracker/style.css",
+    "/expense-tracker/script.js",
+    "/expense-tracker/icons/icon-192x192.png",
+    "/expense-tracker/icons/icon-512x512.png",
 ];
 
 // Install Service Worker & Cache Files
