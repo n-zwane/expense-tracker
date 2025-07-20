@@ -377,19 +377,15 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateCategoryChart() {
         // Get current theme colors
         const isDark = document.body.getAttribute("data-theme") === "dark";
-        const textColor = isDark ? "rgb(119, 119, 119)" : "rgb(119, 119, 119)";
-        const borderColor = isDark
-            ? "rgb(119, 119, 119)"
-            : "rgb(119, 119, 119)";
+        const textColor = isDark ? "#e0e0e0" : "#333333";
+        const borderColor = isDark ? "#2c2c2c" : "#e0e0e0";
 
-        // Filter only expense and savings transactions
+        // Separate expenses and savings
         const expenses = transactions.filter((t) => t.type === "expense");
         const savings = transactions.filter((t) => t.type === "savings");
 
-        // Group by category
+        // Process expenses (will use all colors except blue)
         const expenseData = {};
-        const savingsData = {};
-
         expenses.forEach((transaction) => {
             if (!expenseData[transaction.category]) {
                 expenseData[transaction.category] = 0;
@@ -397,6 +393,8 @@ document.addEventListener("DOMContentLoaded", function () {
             expenseData[transaction.category] += transaction.amount;
         });
 
+        // Process savings (will use blue color)
+        const savingsData = {};
         savings.forEach((transaction) => {
             if (!savingsData[transaction.category]) {
                 savingsData[transaction.category] = 0;
@@ -404,10 +402,10 @@ document.addEventListener("DOMContentLoaded", function () {
             savingsData[transaction.category] += transaction.amount;
         });
 
-        // Prepare data for chart
+        // Prepare data for chart - expenses first, then savings
         const labels = [
-            ...Object.keys(expenseData).map((c) => `Expense: ${c}`),
-            ...Object.keys(savingsData).map((c) => `Savings: ${c}`),
+            ...Object.keys(expenseData).map((c) => `${c}`),
+            ...Object.keys(savingsData).map((c) => `${c}`),
         ];
 
         const data = [
@@ -415,15 +413,13 @@ document.addEventListener("DOMContentLoaded", function () {
             ...Object.values(savingsData),
         ];
 
-        // New color scheme with more variety
-        const colorPalette = [
-            "#4CAF50", // Green
+        // Color palette - reserve blue (rgb(33, 150, 243)) for savings
+        const backgroundColors = [
+            // Colors for expenses (everything except blue)
             "#FF5252", // Red
-            "#2196F3", // Blue
-            "#FFC107", // Amber
+            "#72ff07ff", // Green
             "#9C27B0", // Purple
             "#FF9800", // Orange
-            "#009688", // Teal
             "#795548", // Brown
             "#607D8B", // Blue Grey
             "#E91E63", // Pink
@@ -434,22 +430,26 @@ document.addEventListener("DOMContentLoaded", function () {
             "#673AB7", // Deep Purple
         ];
 
-        // Assign colors based on index, cycling through the palette
-        const backgroundColors = labels.map((_, i) => {
-            return colorPalette[i % colorPalette.length];
-        });
+        // Assign blue to all savings categories
+        const savingsColors = Array(Object.keys(savingsData).length).fill(
+            "rgba(33, 150, 243, 0.8)"
+        );
+
+        // Combine colors
+        const allColors = [
+            ...backgroundColors.slice(0, Object.keys(expenseData).length),
+            ...savingsColors,
+        ];
 
         // Create or update chart
         const ctx = document.getElementById("categoryChart").getContext("2d");
 
         if (categoryChart) {
-            // Update existing chart
             categoryChart.data.labels = labels;
             categoryChart.data.datasets[0].data = data;
-            categoryChart.data.datasets[0].backgroundColor = backgroundColors;
+            categoryChart.data.datasets[0].backgroundColor = allColors;
             categoryChart.update();
         } else {
-            // Create new chart
             categoryChart = new Chart(ctx, {
                 type: "pie",
                 data: {
@@ -457,7 +457,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     datasets: [
                         {
                             data: data,
-                            backgroundColor: backgroundColors,
+                            backgroundColor: allColors,
                             borderColor: borderColor,
                             borderWidth: 1,
                         },
