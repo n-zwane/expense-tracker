@@ -2,12 +2,9 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-        <!-- Primary Meta Tag for iOS needs -->
         <meta
             name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+            content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
         />
         <title>Spendr - Expense Tracker</title>
         <link rel="stylesheet" href="style.css" />
@@ -72,6 +69,10 @@
                         <h4>Expense</h4>
                         <p id="expense-amount">R0.00</p>
                     </div>
+                    <div class="savings">
+                        <h4>Savings</h4>
+                        <p id="savings-amount">R0.00</p>
+                    </div>
                 </div>
             </section>
 
@@ -108,12 +109,20 @@
                             <option value="">Select a category</option>
                             <option value="transport">Transport</option>
                             <option value="shopping">Shopping</option>
-                            <option value="salary">Subscriptions</option>
-                            <option value="bills">Living Essentials</option>
-                            <option value="food">Food and Dining</option>
-                            <option value="salary">Health and Wellness</option>
-                            <option value="salary">Salary or Income</option>
-                            <option value="salary">Savings</option>
+                            <option value="subscriptions">Subscriptions</option>
+                            <option value="living-essentials">
+                                Living Essentials
+                            </option>
+                            <option value="food-and-dining">
+                                Food and Dining
+                            </option>
+                            <option value="health-and-wellness">
+                                Health and Wellness
+                            </option>
+                            <option value="salary-or-income">
+                                Salary or Income
+                            </option>
+                            <option value="savings">Savings</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
@@ -136,6 +145,15 @@
                                 value="expense"
                             />
                             <label for="expense">Expense</label>
+                        </div>
+                        <div class="radio-option">
+                            <input
+                                type="radio"
+                                id="savings"
+                                name="type"
+                                value="savings"
+                            />
+                            <label for="savings">Savings</label>
                         </div>
                     </div>
                     <button type="submit" class="btn">Add Transaction</button>
@@ -170,12 +188,23 @@
                         />
                         <select id="filter-category">
                             <option value="">All Categories</option>
-                            <option value="food">Food</option>
-                            <option value="bills">Bills</option>
-                            <option value="transport">Transport</option>
-                            <option value="shopping">Shopping</option>
-                            <option value="salary">Salary</option>
-                            <option value="other">Other</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Subscriptions">Subscriptions</option>
+                            <option value="Living Essentials">
+                                Living Essentials
+                            </option>
+                            <option value="Food and Dining">
+                                Food and Dining
+                            </option>
+                            <option value="Health and Wellness">
+                                Health and Wellness
+                            </option>
+                            <option value="Salary or Income">
+                                Salary or Income
+                            </option>
+                            <option value="Savings">Savings</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
                 </div>

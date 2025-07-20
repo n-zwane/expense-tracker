@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const balanceAmount = document.getElementById("balance-amount");
     const incomeAmount = document.getElementById("income-amount");
     const expenseAmount = document.getElementById("expense-amount");
+    const savingsAmount = document.getElementById("savings-amount");
     const searchInput = document.getElementById("search");
     const filterCategory = document.getElementById("filter-category");
     const themeToggle = document.getElementById("toggle_checkbox");
@@ -37,8 +38,13 @@ document.addEventListener("DOMContentLoaded", function () {
     let monthlyChart;
 
     // Initialize transactions array from local storage
-    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
+    function updateLocalStorage() {
+        try {
+            localStorage.setItem("transactions", JSON.stringify(transactions));
+        } catch (e) {
+            alert("Failed to save data. Your browser storage might be full.");
+        }
+    }
     // Initialize app
     init();
 
@@ -51,6 +57,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const date = dateInput.value;
         const category = categoryInput.value;
         const type = document.querySelector('input[name="type"]:checked').value;
+
+        // Validate inputs
+        const today = new Date().toISOString().split("T")[0];
+        if (date > today) {
+            alert("Future dates not allowed");
+            return;
+        }
 
         if (
             description === "" ||
@@ -65,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const transaction = {
             id: generateID(),
             description,
-            amount,
+            amount: parseFloat(amount),
             date,
             category,
             type,
@@ -76,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
         addTransactionToDOM(transaction);
         updateBalance();
         updateMonthlyChart();
-        updateCategoryChart(); // Added this line to update pie chart on form submission
+        updateCategoryChart();
         transactionForm.reset();
     });
 
@@ -123,9 +136,17 @@ document.addEventListener("DOMContentLoaded", function () {
         li.className = "transaction-item";
         li.dataset.id = transaction.id;
 
-        const amountClass =
-            transaction.type === "income" ? "income-amount" : "expense-amount";
-        const sign = transaction.type === "income" ? "+" : "-";
+        let amountClass, sign;
+        if (transaction.type === "income") {
+            amountClass = "income-amount";
+            sign = "+";
+        } else if (transaction.type === "expense") {
+            amountClass = "expense-amount";
+            sign = "-";
+        } else {
+            amountClass = "savings-amount";
+            sign = "-";
+        }
 
         li.innerHTML = `
             <div class="transaction-info">
@@ -184,25 +205,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Update balance
     function updateBalance() {
-        const amounts = transactions.map((transaction) =>
-            transaction.type === "income"
-                ? transaction.amount
-                : -transaction.amount
-        );
+        const amounts = transactions.map((transaction) => {
+            if (transaction.type === "income") return transaction.amount;
+            if (transaction.type === "expense") return -transaction.amount;
+            return -transaction.amount; // savings don't affect the balance directly
+        });
 
         const total = amounts.reduce((acc, item) => acc + item, 0).toFixed(2);
-        const income = amounts
-            .filter((item) => item > 0)
-            .reduce((acc, item) => acc + item, 0)
+        const income = transactions
+            .filter((t) => t.type === "income")
+            .reduce((acc, t) => acc + t.amount, 0)
             .toFixed(2);
-        const expense = amounts
-            .filter((item) => item < 0)
-            .reduce((acc, item) => acc + item, 0)
+        const expense = transactions
+            .filter((t) => t.type === "expense")
+            .reduce((acc, t) => acc + t.amount, 0)
+            .toFixed(2);
+        const savings = transactions
+            .filter((t) => t.type === "savings")
+            .reduce((acc, t) => acc + t.amount, 0)
             .toFixed(2);
 
         balanceAmount.textContent = `R${total}`;
         incomeAmount.textContent = `R${income}`;
-        expenseAmount.textContent = `R${Math.abs(expense)}`;
+        expenseAmount.textContent = `R${expense}`;
+        savingsAmount.textContent = `R${savings}`;
     }
 
     // Filter transactions
@@ -244,13 +270,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 monthlyData[monthYear] = {
                     income: 0,
                     expense: 0,
+                    savings: 0,
                 };
             }
 
             if (transaction.type === "income") {
                 monthlyData[monthYear].income += transaction.amount;
-            } else {
+            } else if (transaction.type === "expense") {
                 monthlyData[monthYear].expense += transaction.amount;
+            } else {
+                monthlyData[monthYear].savings += transaction.amount;
             }
         });
 
@@ -272,12 +301,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const expenseData = sortedMonths.map(
             (month) => monthlyData[month].expense
         );
+        const savingsData = sortedMonths.map(
+            (month) => monthlyData[month].savings
+        );
 
         // Create or update chart
         if (monthlyChart) {
             monthlyChart.data.labels = labels;
             monthlyChart.data.datasets[0].data = incomeData;
             monthlyChart.data.datasets[1].data = expenseData;
+            monthlyChart.data.datasets[2].data = savingsData;
             monthlyChart.update();
         } else {
             monthlyChart = new Chart(monthlyChartCtx, {
@@ -297,6 +330,13 @@ document.addEventListener("DOMContentLoaded", function () {
                             data: expenseData,
                             backgroundColor: "rgba(244, 67, 54, 0.7)",
                             borderColor: "rgba(244, 67, 54, 1)",
+                            borderWidth: 1,
+                        },
+                        {
+                            label: "Savings",
+                            data: savingsData,
+                            backgroundColor: "rgba(33, 150, 243, 0.7)",
+                            borderColor: "rgba(33, 150, 243, 1)",
                             borderWidth: 1,
                         },
                     ],
@@ -340,38 +380,62 @@ document.addEventListener("DOMContentLoaded", function () {
             ? "rgb(119, 119, 119)"
             : "rgb(119, 119, 119)";
 
-        // Filter only expense transactions
+        // Filter only expense and savings transactions
         const expenses = transactions.filter((t) => t.type === "expense");
+        const savings = transactions.filter((t) => t.type === "savings");
 
         // Group by category
-        const categoryData = {};
+        const expenseData = {};
+        const savingsData = {};
+
         expenses.forEach((transaction) => {
-            if (!categoryData[transaction.category]) {
-                categoryData[transaction.category] = 0;
+            if (!expenseData[transaction.category]) {
+                expenseData[transaction.category] = 0;
             }
-            categoryData[transaction.category] += transaction.amount;
+            expenseData[transaction.category] += transaction.amount;
+        });
+
+        savings.forEach((transaction) => {
+            if (!savingsData[transaction.category]) {
+                savingsData[transaction.category] = 0;
+            }
+            savingsData[transaction.category] += transaction.amount;
         });
 
         // Prepare data for chart
-        const labels = Object.keys(categoryData).map(
-            (category) =>
-                category.charAt(0).toUpperCase() +
-                category.slice(1).toLowerCase()
-        );
-        const data = Object.values(categoryData);
-
-        // Category colors
-        const backgroundColors = [
-            "rgba(244, 67, 54, 0.8)", // Red
-            "rgba(255, 152, 0, 0.8)", // Orange
-            "rgba(255, 235, 59, 0.8)", // Yellow
-            "rgba(76, 175, 80, 0.8)", // Green
-            "rgba(33, 150, 243, 0.8)", // Blue
-            "rgba(156, 39, 176, 0.8)", // Purple
-            "rgba(233, 30, 99, 0.8)", // Pink
-            "rgba(63, 81, 181, 0.7)", // Indigo
-            "rgba(0, 150, 136, 0.7)", // Teal
+        const labels = [
+            ...Object.keys(expenseData).map((c) => `Expense: ${c}`),
+            ...Object.keys(savingsData).map((c) => `Savings: ${c}`),
         ];
+
+        const data = [
+            ...Object.values(expenseData),
+            ...Object.values(savingsData),
+        ];
+
+        // New color scheme with more variety
+        const colorPalette = [
+            "#4CAF50", // Green
+            "#FF5252", // Red
+            "#2196F3", // Blue
+            "#FFC107", // Amber
+            "#9C27B0", // Purple
+            "#FF9800", // Orange
+            "#009688", // Teal
+            "#795548", // Brown
+            "#607D8B", // Blue Grey
+            "#E91E63", // Pink
+            "#8BC34A", // Light Green
+            "#00BCD4", // Cyan
+            "#3F51B5", // Indigo
+            "#CDDC39", // Lime
+            "#673AB7", // Deep Purple
+        ];
+
+        // Assign colors based on index, cycling through the palette
+        const backgroundColors = labels.map((_, i) => {
+            return colorPalette[i % colorPalette.length];
+        });
 
         // Create or update chart
         const ctx = document.getElementById("categoryChart").getContext("2d");
@@ -380,8 +444,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Update existing chart
             categoryChart.data.labels = labels;
             categoryChart.data.datasets[0].data = data;
-            categoryChart.data.datasets[0].backgroundColor =
-                backgroundColors.slice(0, labels.length);
+            categoryChart.data.datasets[0].backgroundColor = backgroundColors;
             categoryChart.update();
         } else {
             // Create new chart
@@ -392,10 +455,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     datasets: [
                         {
                             data: data,
-                            backgroundColor: backgroundColors.slice(
-                                0,
-                                labels.length
-                            ),
+                            backgroundColor: backgroundColors,
                             borderColor: borderColor,
                             borderWidth: 1,
                         },
@@ -441,7 +501,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Generate random ID
     function generateID() {
-        return Math.floor(Math.random() * 1000000000);
+        return Date.now() + Math.floor(Math.random() * 1000);
     }
 
     // Format date
@@ -450,122 +510,170 @@ document.addEventListener("DOMContentLoaded", function () {
         return new Date(dateString).toLocaleDateString("en-US", options);
     }
 
-    // Add these functions to script.js
-
     // CSV Export
-    document
-        .getElementById("export-csv")
-        .addEventListener("click", exportToCSV);
-
     function exportToCSV() {
         if (transactions.length === 0) {
             alert("No transactions to export");
             return;
         }
 
-        // Create CSV header
-        let csv = "ID,Description,Amount,Date,Category,Type\n";
+        const btn = document.getElementById("export-csv");
+        const originalText = btn.textContent;
 
-        // Add each transaction
-        transactions.forEach((transaction) => {
-            csv += `${transaction.id},"${transaction.description}",${transaction.amount},"${transaction.date}","${transaction.category}","${transaction.type}"\n`;
-        });
+        // Set loading state
+        btn.disabled = true;
+        btn.textContent = "Generating CSV...";
+        btn.classList.add("export-loading");
 
-        // Create download link
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `spendr_transactions_${new Date()
-            .toISOString()
-            .slice(0, 10)}.csv`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        setTimeout(() => {
+            try {
+                const exportDate = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+                let csv = "ID,Description,Amount,Date,Category,Type\n";
+                transactions.forEach((transaction) => {
+                    csv += `${transaction.id},"${transaction.description}",${transaction.amount},"${transaction.date}","${transaction.category}","${transaction.type}"\n`;
+                });
+
+                const blob = new Blob([csv], {
+                    type: "text/csv;charset=utf-8;",
+                });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `spendr_transactions_${exportDate}.csv`; // Use exportDate here
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e) {
+                console.error("CSV export failed:", e);
+                alert("Failed to generate CSV. Please try again.");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                btn.classList.remove("export-loading");
+            }
+        }, 100); // Small delay for UI responsiveness
     }
 
     // PDF Export
-    document
-        .getElementById("export-pdf")
-        .addEventListener("click", exportToPDF);
-
     function exportToPDF() {
         if (transactions.length === 0) {
             alert("No transactions to export");
             return;
         }
 
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const btn = document.getElementById("export-pdf");
+        const originalText = btn.textContent;
 
-        // Add title
-        doc.setFontSize(18);
-        doc.text("Spendr Transaction History", 14, 20);
+        // Set loading state
+        btn.disabled = true;
+        btn.textContent = "Generating PDF...";
+        btn.classList.add("export-loading"); // Add loading class for styling
 
-        // Add date
-        doc.setFontSize(10);
-        doc.text(`Exported on: ${new Date().toLocaleDateString()}`, 14, 28);
+        // Use setTimeout to allow UI to update before heavy PDF generation
+        setTimeout(() => {
+            try {
+                const exportDate = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
 
-        // Add balance summary
-        doc.setFontSize(12);
-        doc.text(
-            `Current Balance: R${balanceAmount.textContent.substring(1)}`,
-            14,
-            36
-        );
-        doc.text(
-            `Total Income: R${incomeAmount.textContent.substring(1)}`,
-            14,
-            44
-        );
-        doc.text(
-            `Total Expenses: R${expenseAmount.textContent.substring(1)}`,
-            14,
-            52
-        );
+                // Add title
+                doc.setFontSize(18);
+                doc.text("Spendr Transaction History", 14, 20);
 
-        // Prepare table data
-        const tableData = transactions.map((transaction) => [
-            transaction.id,
-            transaction.description,
-            transaction.type === "income"
-                ? `R${transaction.amount.toFixed(2)}`
-                : `-R${transaction.amount.toFixed(2)}`,
-            formatDate(transaction.date),
-            transaction.category.charAt(0).toUpperCase() +
-                transaction.category.slice(1),
-            transaction.type.charAt(0).toUpperCase() +
-                transaction.type.slice(1),
-        ]);
+                // Add date
+                doc.setFontSize(10);
+                doc.text(
+                    `Exported on: ${new Date().toLocaleDateString()}`,
+                    14,
+                    28
+                );
 
-        // Add table
-        doc.autoTable({
-            startY: 60,
-            head: [["ID", "Description", "Amount", "Date", "Category", "Type"]],
-            body: tableData,
-            theme: "grid",
-            headStyles: {
-                fillColor: [33, 150, 243],
-                textColor: 255,
-            },
-            styles: {
-                cellPadding: 3,
-                fontSize: 9,
-                valign: "middle",
-            },
-            columnStyles: {
-                0: { cellWidth: 15 },
-                1: { cellWidth: 50 },
-                2: { cellWidth: 25 },
-                3: { cellWidth: 30 },
-                4: { cellWidth: 30 },
-                5: { cellWidth: 25 },
-            },
-        });
+                // Add balance summary
+                doc.setFontSize(12);
+                doc.text(
+                    `Current Balance: R${balanceAmount.textContent.substring(
+                        1
+                    )}`,
+                    14,
+                    36
+                );
+                doc.text(
+                    `Total Income: R${incomeAmount.textContent.substring(1)}`,
+                    14,
+                    44
+                );
+                doc.text(
+                    `Total Expenses: R${expenseAmount.textContent.substring(
+                        1
+                    )}`,
+                    14,
+                    52
+                );
+                doc.text(
+                    `Total Savings: R${savingsAmount.textContent.substring(1)}`,
+                    14,
+                    60
+                );
 
-        // Save the PDF
-        doc.save(
-            `spendr_transactions_${new Date().toISOString().slice(0, 10)}.pdf`
-        );
+                // Prepare table data
+                const tableData = transactions.map((transaction) => [
+                    transaction.id,
+                    transaction.description,
+                    transaction.type === "income"
+                        ? `R${transaction.amount.toFixed(2)}`
+                        : `-R${transaction.amount.toFixed(2)}`,
+                    formatDate(transaction.date),
+                    transaction.category.charAt(0).toUpperCase() +
+                        transaction.category.slice(1),
+                    transaction.type.charAt(0).toUpperCase() +
+                        transaction.type.slice(1),
+                ]);
+
+                // Add table
+                doc.autoTable({
+                    startY: 68,
+                    head: [
+                        [
+                            "ID",
+                            "Description",
+                            "Amount",
+                            "Date",
+                            "Category",
+                            "Type",
+                        ],
+                    ],
+                    body: tableData,
+                    theme: "grid",
+                    headStyles: {
+                        fillColor: [33, 150, 243],
+                        textColor: 255,
+                    },
+                    styles: {
+                        cellPadding: 3,
+                        fontSize: 9,
+                        valign: "middle",
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 15 },
+                        1: { cellWidth: 50 },
+                        2: { cellWidth: 25 },
+                        3: { cellWidth: 30 },
+                        4: { cellWidth: 30 },
+                        5: { cellWidth: 25 },
+                    },
+                });
+
+                // Save the PDF
+                doc.save(`spendr_transactions_${exportDate}.pdf`); // Use exportDate here
+            } catch (e) {
+                console.error("PDF generation failed:", e);
+                alert("Failed to generate PDF. Please try again.");
+            } finally {
+                // Reset button state
+                btn.disabled = false;
+                btn.textContent = originalText;
+                btn.classList.remove("export-loading");
+            }
+        }, 100); // Small delay to ensure UI responsiveness
     }
 });

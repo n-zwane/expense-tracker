@@ -8,6 +8,7 @@
     --button-color: #2196f3;
     --button-hover: #1976d2;
     --border-color: #e0e0e0;
+    --savings-color: #2196f3;
 }
 
 [data-theme="dark"] {
@@ -20,6 +21,7 @@
     --button-color: #1976d2;
     --button-hover: #1565c0;
     --border-color: #2c2c2c;
+    --savings-color: #64b5f6;
 }
 
 * {
@@ -184,6 +186,7 @@ h1 {
 .income-expense {
     display: flex;
     justify-content: space-between;
+    gap: 10px;
     background-color: var(--card-bg);
     padding: 20px;
     border-radius: 10px;
@@ -208,6 +211,24 @@ h1 {
 
 .expense p {
     color: var(--expense-color);
+    font-weight: bold;
+}
+
+.savings-amount {
+    color: var(--savings-color);
+}
+
+.savings {
+    text-align: center;
+    flex: 1;
+}
+
+.savings h4 {
+    margin-bottom: 5px;
+}
+
+.savings p {
+    color: var(--savings-color);
     font-weight: bold;
 }
 
@@ -246,7 +267,8 @@ h1 {
 
 .radio-group {
     display: flex;
-    gap: 15px;
+    justify-content: center;
+    gap: 50px;
     margin-top: 15px;
     align-items: center;
 }
@@ -465,6 +487,12 @@ footer a:hover {
         gap: 15px;
     }
 
+    .income,
+    .expense,
+    .savings {
+        flex: 1 1 75px; /* Allow items to wrap and have minimum width */
+    }
+
     .section-header {
         flex-direction: column;
         align-items: flex-start;
@@ -475,33 +503,37 @@ footer a:hover {
         width: 100%;
         flex-direction: column;
     }
+
+    .radio-group {
+        flex-direction: flex;
+        align-items: center;
+        gap: 20px;
+    }
 }
 
-/* Added iOS fixes for radio buttons */
-@supports (-webkit-touch-callout: none) {
-    .radio-option input[type="radio"] {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 18px;
-        height: 18px;
-        border: 2px solid var(--border-color);
-        border-radius: 50%;
-        margin: 0;
-        position: relative;
-    }
+/* Loading state for export buttons (applies to both PDF & CSV) */
+.btn.export-loading {
+    position: relative;
+    opacity: 0.8;
+    pointer-events: none; /* Prevents clicks while loading */
+}
 
-    .radio-option input[type="radio"]:checked {
-        border-color: var(--button-color);
-    }
+.btn.export-loading::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+}
 
-    .radio-option input[type="radio"]:checked::after {
-        content: "";
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        width: 10px;
-        height: 10px;
-        background: var(--button-color);
-        border-radius: 50%;
+@keyframes spin {
+    to {
+        transform: translateY(-50%) rotate(360deg);
     }
 }
