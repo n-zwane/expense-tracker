@@ -38,6 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let monthlyChart;
 
     // Initialize transactions array from local storage
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
     function updateLocalStorage() {
         try {
             localStorage.setItem("transactions", JSON.stringify(transactions));
