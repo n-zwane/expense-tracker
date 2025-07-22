@@ -39,18 +39,26 @@
     </head>
     <body>
         <div class="container">
-            <!-- Header with Theme Toggle -->
+            <!-- Header with Theme Toggle and Privacy Toggle -->
             <header>
                 <h1>Spendr</h1>
-                <div class="theme-toggle">
-                    <input type="checkbox" id="toggle_checkbox" />
-                    <label for="toggle_checkbox">
-                        <div id="star">
-                            <div class="star" id="star-1">★</div>
-                            <div class="star" id="star-2">★</div>
-                        </div>
-                        <div id="moon"></div>
-                    </label>
+                <div class="header-controls">
+                    <div class="privacy-toggle">
+                        <input type="checkbox" id="privacy_toggle" />
+                        <label for="privacy_toggle" title="Toggle privacy mode">
+                            <i class="fas fa-eye-slash"></i>
+                        </label>
+                    </div>
+                    <div class="theme-toggle">
+                        <input type="checkbox" id="toggle_checkbox" />
+                        <label for="toggle_checkbox">
+                            <div id="star">
+                                <div class="star" id="star-1">★</div>
+                                <div class="star" id="star-2">★</div>
+                            </div>
+                            <div id="moon"></div>
+                        </label>
+                    </div>
                 </div>
             </header>
 
@@ -58,20 +66,24 @@
             <section class="balance-summary">
                 <div class="balance-card">
                     <h3>Your Balance</h3>
-                    <p id="balance-amount">R0.00</p>
+                    <p id="balance-amount" class="amount-sensitive">R0.00</p>
                 </div>
                 <div class="income-expense">
                     <div class="income">
                         <h4>Income</h4>
-                        <p id="income-amount">R0.00</p>
+                        <p id="income-amount" class="amount-sensitive">R0.00</p>
                     </div>
                     <div class="expense">
                         <h4>Expense</h4>
-                        <p id="expense-amount">R0.00</p>
+                        <p id="expense-amount" class="amount-sensitive">
+                            R0.00
+                        </p>
                     </div>
                     <div class="savings">
                         <h4>Savings</h4>
-                        <p id="savings-amount">R0.00</p>
+                        <p id="savings-amount" class="amount-sensitive">
+                            R0.00
+                        </p>
                     </div>
                 </div>
             </section>

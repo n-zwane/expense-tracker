@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const filterCategory = document.getElementById("filter-category");
     const themeToggle = document.getElementById("toggle_checkbox");
     const monthlyChartCtx = document.getElementById("monthlyChart");
+    const privacyToggle = document.getElementById("privacy_toggle");
     let monthlyChart;
 
     // Initialize transactions array from local storage
@@ -108,12 +109,23 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem("theme", this.checked ? "dark" : "light");
     });
 
+    // Privacy toggle
+    privacyToggle.addEventListener("change", function () {
+        document.body.classList.toggle("privacy-mode", this.checked);
+        localStorage.setItem("privacyMode", this.checked);
+    });
+
     // Initialize app
     function init() {
         // Set theme from local storage
         const savedTheme = localStorage.getItem("theme") || "light";
         document.body.setAttribute("data-theme", savedTheme);
         themeToggle.checked = savedTheme === "dark";
+
+        // Set privacy mode from local storage
+        const savedPrivacyMode = localStorage.getItem("privacyMode") === "true";
+        document.body.classList.toggle("privacy-mode", savedPrivacyMode);
+        privacyToggle.checked = savedPrivacyMode;
 
         // Set today's date as default
         dateInput.valueAsDate = new Date();
@@ -164,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     )}</span>
                 </div>
             </div>
-            <div class="transaction-amount ${amountClass}">${sign}R${Math.abs(
+            <div class="transaction-amount ${amountClass} amount-sensitive">${sign}R${Math.abs(
             transaction.amount
         ).toFixed(2)}</div>
             <button class="delete-btn" data-id="${
