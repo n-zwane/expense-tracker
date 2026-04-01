@@ -1,10 +1,10 @@
-# Spendr – Expense Tracker 💰
+# Spendr – Expense Tracker
 
 A minimalist expense tracker with dark mode, monthly charts, and local storage support.
 
 ---
 
-## 🌟 The Story Behind Spendr
+## The Story Behind Spendr
 
 I created **Spendr** after searching for a simple, ad-free expense tracker and realizing that most apps were either overloaded with features, locked behind paywalls, or full of ads. I wanted something clean, fast, and distraction-free — just a tool to track what I earn and spend, without selling my data or crowding my screen.
 
@@ -12,7 +12,7 @@ I created **Spendr** after searching for a simple, ad-free expense tracker and r
 
 ---
 
-## ✨ Features
+## Features
 
 -   Add income and expense transactions
 -   View balance, income, and expense summaries
@@ -27,7 +27,7 @@ I created **Spendr** after searching for a simple, ad-free expense tracker and r
 
 ---
 
-## 🚀 How to Use
+## How to Use
 
 1. 🔗 [View the Live Site Here](https://n-zwane.github.io/expense-tracker/)
 2. **Local Setup**:
@@ -38,7 +38,7 @@ I created **Spendr** after searching for a simple, ad-free expense tracker and r
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 -   Frontend: Vanilla JavaScript (ES6), HTML5, CSS3
 -   Visualizations: Chart.js
@@ -47,7 +47,7 @@ I created **Spendr** after searching for a simple, ad-free expense tracker and r
 
 ---
 
-### 🧗 Development Journey: Challenges & Solutions
+### Development Journey: Challenges & Solutions
 
 1. **Making It Work Offline**
 
@@ -66,7 +66,7 @@ I created **Spendr** after searching for a simple, ad-free expense tracker and r
 
 ---
 
-## 📜 License
+## License
 
 This project is open-source under the MIT License.  
 Feel free to use it, learn from it, and make it your own — no ads, no paywalls, no nonsense.
